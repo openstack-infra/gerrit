@@ -15,6 +15,7 @@
 package com.google.gerrit.client;
 
 import com.google.gerrit.client.auth.openid.OpenIdSignInDialog;
+import com.google.gerrit.client.auth.openid.OpenIdSsoPanel;
 import com.google.gerrit.client.auth.userpass.UserPassSignInDialog;
 import com.google.gerrit.client.changes.ChangeListScreen;
 import com.google.gerrit.client.rpc.GerritCallback;
@@ -81,6 +82,7 @@ public class Gerrit implements EntryPoint {
   private static RootPanel siteHeader;
   private static RootPanel siteFooter;
   private static SearchPanel searchPanel;
+  private static OpenIdSsoPanel singleSignOnPanel;
   private static final Dispatcher dispatcher = new Dispatcher();
   private static ViewSite<Screen> body;
 
@@ -221,6 +223,10 @@ public class Gerrit implements EntryPoint {
         Location.assign(Location.getPath() + "become");
         break;
 
+      case OPENID_SSO:
+	singleSignOnPanel.authenticate(SignInMode.SIGN_IN, token);
+        break;
+
       case OPENID:
         new OpenIdSignInDialog(SignInMode.SIGN_IN, token, null).center();
         break;
@@ -359,6 +365,7 @@ public class Gerrit implements EntryPoint {
     menuLeft = new TabPanel();
     menuRight = new LinkMenuBar();
     searchPanel = new SearchPanel();
+    singleSignOnPanel = new OpenIdSsoPanel();
     menuLeft.setStyleName(RESOURCES.css().topmenuMenuLeft());
     menuLine.setStyleName(RESOURCES.css().topmenu());
     gTopMenu.add(menuLine);
@@ -366,6 +373,7 @@ public class Gerrit implements EntryPoint {
     menuRightPanel.setStyleName(RESOURCES.css().topmenuMenuRight());
     menuRightPanel.add(menuRight);
     menuRightPanel.add(searchPanel);
+    menuRightPanel.add(singleSignOnPanel);
     menuLine.setWidget(0, 0, menuLeft);
     menuLine.setWidget(0, 1, new FlowPanel());
     menuLine.setWidget(0, 2, menuRightPanel);
@@ -508,6 +516,14 @@ public class Gerrit implements EntryPoint {
             }
           });
           break;
+
+        case OPENID_SSO:
+          menuRight.addItem(C.menuSignIn(), new Command() {
+            public void execute() {
+              doSignIn(History.getToken());
+            }
+          });
+	  break;
 
         case LDAP:
         case LDAP_BIND:
