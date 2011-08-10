@@ -79,6 +79,8 @@ public final class Project {
 
   protected NameKey parent;
 
+  protected boolean requireShortMessage;
+
   protected boolean requireChangeID;
 
   protected boolean useContentMerge;
@@ -123,6 +125,10 @@ public final class Project {
     return useContentMerge;
   }
 
+  public boolean isRequireShortMessage() {
+    return requireShortMessage;
+  }
+
   public boolean isRequireChangeID() {
     return requireChangeID;
   }
@@ -133,6 +139,10 @@ public final class Project {
 
   public void setUseContentMerge(final boolean cm) {
     useContentMerge = cm;
+  }
+
+  public void setRequireShortMessage(final boolean sm) {
+    requireShortMessage = sm;
   }
 
   public void setRequireChangeID(final boolean cid) {
@@ -152,6 +162,7 @@ public final class Project {
     useContributorAgreements = update.useContributorAgreements;
     useSignedOffBy = update.useSignedOffBy;
     useContentMerge = update.useContentMerge;
+    requireShortMessage = update.requireShortMessage;
     requireChangeID = update.requireChangeID;
     submitType = update.submitType;
   }
