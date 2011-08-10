@@ -107,6 +107,8 @@ public class ReceiveCommits implements PreReceiveHook, PostReceiveHook {
   private static final FooterKey TESTED_BY = new FooterKey("Tested-by");
   private static final FooterKey CHANGE_ID = new FooterKey("Change-Id");
 
+  private static final long COMMIT_SUBJECT_LENGTH = 50;
+
   public interface Factory {
     ReceiveCommits create(ProjectControl projectControl, Repository repository);
   }
@@ -1532,6 +1534,26 @@ public class ReceiveCommits implements PreReceiveHook, PostReceiveHook {
       }
     }
 
+    // Check for people 
+    if (project.isRequireShortMessage() &&
+      (COMMIT_SUBJECT_LENGTH < c.getShortMessage().length())) {
+
+      String errMsg = "first line of commit message is too long";
+      reject(cmd, errMsg);
+
+      StringBuilder sb = new StringBuilder();
+      sb.append("ERROR: ").append(errMsg).append("\n");
+      sb.append("The first line in a commit should be no more than ");
+      sb.append(COMMIT_SUBJECT_LENGTH).append(" characters\n\n");
+
+      sb.append("Please ammend your commit with:\n\n");
+      sb.append("  git commit --amend\n\n");
+      sb.append("and resubmit.\n");
+
+      rp.sendMessage(sb.toString());
+      return false;
+    }
+
     final List<String> idList = c.getFooterLines(CHANGE_ID);
     if ((cmd.getRefName().startsWith(NEW_CHANGE) || NEW_PATCHSET.matcher(cmd.getRefName()).matches())) {
       if (idList.isEmpty()) {
@@ -1654,7 +1676,7 @@ public class ReceiveCommits implements PreReceiveHook, PostReceiveHook {
 
   private void warnMalformedMessage(RevCommit c) {
     ObjectReader reader = rp.getRevWalk().getObjectReader();
-    if (65 < c.getShortMessage().length()) {
+    if (COMMIT_SUBJECT_LENGTH < c.getShortMessage().length()) {
       AbbreviatedObjectId id;
       try {
         id = reader.abbreviate(c);
@@ -1662,7 +1684,7 @@ public class ReceiveCommits implements PreReceiveHook, PostReceiveHook {
         id = c.abbreviate(6);
       }
       rp.sendMessage("(W) " + id.name() //
-          + ": commit subject >65 characters; use shorter first paragraph");
+          + ": commit subject >" + COMMIT_SUBJECT_LENGTH + " characters; use shorter first paragraph");
     }
 
     int longLineCnt = 0, nonEmptyCnt = 0;
