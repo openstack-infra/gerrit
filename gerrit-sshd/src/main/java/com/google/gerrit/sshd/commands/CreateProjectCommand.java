@@ -75,6 +75,9 @@ final class CreateProjectCommand extends BaseCommand {
   @Option(name = "--use-content-merge", usage = "allow automatic conflict resolving within files")
   private boolean contentMerge;
 
+  @Option(name = "--require-short-message", usage = "if short commit subject is required")
+  private boolean requireShortMessage;
+
   @Option(name = "--require-change-id", aliases = {"--id"}, usage = "if change-id is required")
   private boolean requireChangeID;
 
@@ -134,6 +137,7 @@ final class CreateProjectCommand extends BaseCommand {
             args.contributorAgreements = contributorAgreements;
             args.signedOffBy = signedOffBy;
             args.contentMerge = contentMerge;
+            args.shortMessageRequired = requireShortMessage;
             args.changeIdRequired = requireChangeID;
             args.branch = branch;
             args.createEmptyCommit = createEmptyCommit;
