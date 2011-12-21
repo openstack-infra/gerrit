@@ -274,7 +274,8 @@ public class Daemon extends SiteProgram {
     }
 
     AuthConfig authConfig = cfgInjector.getInstance(AuthConfig.class);
-    if (authConfig.getAuthType() == AuthType.OPENID) {
+    if (authConfig.getAuthType() == AuthType.OPENID ||
+	authConfig.getAuthType() == AuthType.OPENID_SSO) {
       modules.add(new OpenIdModule());
     }
     modules.add(sysInjector.getInstance(GetUserFilter.Module.class));

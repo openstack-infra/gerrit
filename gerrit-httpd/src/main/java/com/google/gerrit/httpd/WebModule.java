@@ -109,6 +109,7 @@ public class WebModule extends FactoryModule {
         break;
 
       case OPENID:
+      case OPENID_SSO:
         // OpenID support is bound in WebAppInitializer and Daemon.
       case CUSTOM_EXTENSION:
         break;
