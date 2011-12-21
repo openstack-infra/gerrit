@@ -94,6 +94,7 @@ public class WebModule extends FactoryModule {
 
     switch (authConfig.getAuthType()) {
       case OPENID:
+      case OPENID_SSO:
         install(new OpenIdModule());
         break;
 
