@@ -145,7 +145,6 @@ public class NewAgreementScreen extends AccountScreen {
       }
     });
     finalGroup.add(submit);
-    formBody.add(finalGroup);
     new OnEditEnabler(submit, yesIAgreeBox);
 
     final FormPanel form = new FormPanel();
