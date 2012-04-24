@@ -31,5 +31,6 @@ public class HostPageData {
     public String textColor;
     public String trimColor;
     public String selectionColor;
+    public String changeTableOutdatedColor;
   }
 }

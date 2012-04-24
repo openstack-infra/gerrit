@@ -43,6 +43,7 @@ class ThemeFactory {
     theme.trimColor = color(name, "trimColor", "#D4E9A9");
     theme.selectionColor = color(name, "selectionColor", "#FFFFCC");
     theme.topMenuColor = color(name, "topMenuColor", theme.trimColor);
+    theme.changeTableOutdatedColor = color(name, "changeTableOutdatedColor", "#FF0000");
     return theme;
   }
 

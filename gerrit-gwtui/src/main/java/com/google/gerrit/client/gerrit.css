@@ -43,7 +43,7 @@
 @eval textColor com.google.gerrit.client.Gerrit.getTheme().textColor;
 @eval trimColor com.google.gerrit.client.Gerrit.getTheme().trimColor;
 @eval selectionColor com.google.gerrit.client.Gerrit.getTheme().selectionColor;
-
+@eval changeTableOutdatedColor com.google.gerrit.client.Gerrit.getTheme().changeTableOutdatedColor;
 
 @sprite .greenCheckClass {
   gwt-image: "greenCheck";
@@ -397,7 +397,7 @@
 }
 
 .changeTable .outdated {
-  background: red;
+  background: changeTableOutdatedColor;
 }
 
 .changeTable .iconCell {
