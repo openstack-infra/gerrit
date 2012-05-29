@@ -84,6 +84,7 @@ public class ChangeQueryBuilder extends QueryBuilder<ChangeData> {
   public static final String FIELD_REF = "ref";
   public static final String FIELD_REVIEWER = "reviewer";
   public static final String FIELD_REVIEWERIN = "reviewerin";
+  public static final String FIELD_REVIEWEDBY = "reviewedby";
   public static final String FIELD_STARREDBY = "starredby";
   public static final String FIELD_STATUS = "status";
   public static final String FIELD_TOPIC = "topic";
@@ -190,6 +191,9 @@ public class ChangeQueryBuilder extends QueryBuilder<ChangeData> {
     } else if ("reviewed".equalsIgnoreCase(statusName)) {
       return new IsReviewedPredicate(args.dbProvider);
 
+    } else if ("reviewable".equalsIgnoreCase(statusName)) {
+      return is_reviewable();
+
     } else {
       return new ChangeStatusPredicate(args.dbProvider, statusName);
     }
@@ -231,6 +235,10 @@ public class ChangeQueryBuilder extends QueryBuilder<ChangeData> {
 
     if ("reviewed".equalsIgnoreCase(value)) {
       return new IsReviewedPredicate(args.dbProvider);
+    }
+
+    if ("reviewable".equalsIgnoreCase(value)) {
+      return is_reviewable();
     }
 
     try {
@@ -370,6 +378,27 @@ public class ChangeQueryBuilder extends QueryBuilder<ChangeData> {
 
   public Predicate<ChangeData> is_visible() {
     return visibleto(currentUser);
+  }
+
+  public Predicate<ChangeData> is_reviewable() {
+    if (currentUser instanceof IdentifiedUser) {
+      // (is:open and -reviewedby:currentUser and -owner:currentUser) and
+      // (watchedby:currentUser or starredby:currentUser or reviewer:currentUser)
+      return Predicate.and(
+              Predicate.and(
+                status_open(),
+                Predicate.not(new ReviewedByPredicate(args.dbProvider, ((IdentifiedUser) currentUser).getAccountId())),
+                Predicate.not(new OwnerPredicate(args.dbProvider, ((IdentifiedUser) currentUser).getAccountId()))
+              ),
+              Predicate.or(
+                new IsWatchedByPredicate(args, currentUser),
+                new IsStarredByPredicate(args.dbProvider, currentUser),
+                new ReviewerPredicate(args.dbProvider, ((IdentifiedUser) currentUser).getAccountId())
+              )
+            );
+    }
+
+    throw new IllegalArgumentException();
   }
 
   @Operator
