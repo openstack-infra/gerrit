@@ -189,6 +189,16 @@ public class ChangeControl {
     ;
   }
 
+  /** Can this user change the status to Work In Progress? */
+  public boolean canSetWorkInProgress() {
+    return canAbandon();
+  }
+
+  /** Can the user change the status from Work In Progress to New? */
+  public boolean canSetReadyForReview() {
+    return canSetWorkInProgress();
+  }
+
   /** Can this user publish this draft change or any draft patch set of this change? */
   public boolean canPublish(final ReviewDb db) throws OrmException {
     return isOwner() && isVisible(db);
