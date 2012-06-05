@@ -387,6 +387,7 @@ public class ChangeQueryBuilder extends QueryBuilder<ChangeData> {
       return Predicate.and(
               Predicate.and(
                 status_open(),
+                Predicate.not(new ChangeStatusPredicate(args.dbProvider, "workinprogress")),
                 Predicate.not(new ReviewedByPredicate(args.dbProvider, ((IdentifiedUser) currentUser).getAccountId())),
                 Predicate.not(new OwnerPredicate(args.dbProvider, ((IdentifiedUser) currentUser).getAccountId()))
               ),
