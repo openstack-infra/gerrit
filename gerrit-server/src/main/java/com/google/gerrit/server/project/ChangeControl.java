@@ -191,7 +191,11 @@ public class ChangeControl {
 
   /** Can this user change the status to Work In Progress? */
   public boolean canSetWorkInProgress() {
-    return canAbandon();
+    return isOwner() // owner (aka creator) of the change can WIP
+        || getRefControl().isOwner() // branch owner can WIP
+        || getProjectControl().isOwner() // project owner can WIP
+        || getCurrentUser().getCapabilities().canAdministrateServer() // site administers are god
+        || getRefControl().canSetWorkInProgress();
   }
 
   /** Can the user change the status from Work In Progress to New? */
