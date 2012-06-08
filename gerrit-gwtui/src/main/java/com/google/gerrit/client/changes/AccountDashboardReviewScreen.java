@@ -42,8 +42,8 @@ public class AccountDashboardReviewScreen extends Screen implements ChangeListSc
     table = new ChangeTable(true);
     table.addStyleName(Gerrit.RESOURCES.css().accountDashboard());
     byOwner = new ChangeTable.Section("", ApprovalViewType.STRONGEST, null);
-    forReview = new ChangeTable.Section("", ApprovalViewType.USER, ownerId);
-    haveReviewed = new ChangeTable.Section("", ApprovalViewType.USER, ownerId);
+    forReview = new ChangeTable.Section("", ApprovalViewType.STRONGEST, null);
+    haveReviewed = new ChangeTable.Section("", ApprovalViewType.STRONGEST, null);
 
     table.addSection(byOwner);
     table.addSection(forReview);
