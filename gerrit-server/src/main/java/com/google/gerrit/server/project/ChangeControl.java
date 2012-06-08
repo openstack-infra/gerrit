@@ -191,6 +191,9 @@ public class ChangeControl {
 
   /** Can this user change the status to Work In Progress? */
   public boolean canSetWorkInProgress() {
+    if (change.getStatus() == Change.Status.DRAFT) {
+      return false; // can't WIP a draft
+    }
     return isOwner() // owner (aka creator) of the change can WIP
         || getRefControl().isOwner() // branch owner can WIP
         || getProjectControl().isOwner() // project owner can WIP
