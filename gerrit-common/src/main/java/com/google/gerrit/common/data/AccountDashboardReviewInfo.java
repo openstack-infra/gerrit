@@ -60,11 +60,12 @@ public class AccountDashboardReviewInfo {
   }
 
   public void setForReview(List<ChangeInfo> c) {
-    // Although a change that is "Work In Progress" is officially "open",
-    // we don't want to see those in our review list.
+    // Although a change that is "Work In Progress" or "Draft" is officially
+    // "open", we don't want to see those in our review list.
     final ArrayList<ChangeInfo> r = new ArrayList<ChangeInfo>();
     for (ChangeInfo ci: c) {
-      if (ci.getStatus() != Change.Status.WORKINPROGRESS) {
+      if (ci.getStatus() != Change.Status.DRAFT &&
+          ci.getStatus() != Change.Status.WORKINPROGRESS) {
         r.add(ci);
       }
     }
@@ -77,11 +78,12 @@ public class AccountDashboardReviewInfo {
   }
 
   public void setHaveReviewed(List<ChangeInfo> c) {
-    // Although a change that is "Work In Progress" is officially "open",
-    // we don't want to see those in our review list.
+    // Although a change that is "Work In Progress" or "Draft" is officially
+    // "open", we don't want to see those in our review list.
     final ArrayList<ChangeInfo> r = new ArrayList<ChangeInfo>();
     for (ChangeInfo ci: c) {
-      if (ci.getStatus() != Change.Status.WORKINPROGRESS) {
+      if (ci.getStatus() != Change.Status.DRAFT &&
+          ci.getStatus() != Change.Status.WORKINPROGRESS) {
         r.add(ci);
       }
     }

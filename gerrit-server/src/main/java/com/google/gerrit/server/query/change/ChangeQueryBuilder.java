@@ -382,11 +382,13 @@ public class ChangeQueryBuilder extends QueryBuilder<ChangeData> {
 
   public Predicate<ChangeData> is_reviewable() {
     if (currentUser instanceof IdentifiedUser) {
-      // (is:open and -reviewedby:currentUser and -owner:currentUser) and
+      // (is:open and -status:workinprogress  and -status:draft and
+      // -reviewedby:currentUser and -owner:currentUser) and
       // (watchedby:currentUser or starredby:currentUser or reviewer:currentUser)
       return Predicate.and(
               Predicate.and(
                 status_open(),
+                Predicate.not(new ChangeStatusPredicate(args.dbProvider, "draft")),
                 Predicate.not(new ChangeStatusPredicate(args.dbProvider, "workinprogress")),
                 Predicate.not(new ReviewedByPredicate(args.dbProvider, ((IdentifiedUser) currentUser).getAccountId())),
                 Predicate.not(new OwnerPredicate(args.dbProvider, ((IdentifiedUser) currentUser).getAccountId()))
