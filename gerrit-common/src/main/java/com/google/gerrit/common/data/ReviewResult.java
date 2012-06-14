@@ -76,7 +76,13 @@ public class ReviewResult {
       NOT_A_DRAFT,
 
       /** Error writing change to git repository */
-      GIT_ERROR
+      GIT_ERROR,
+
+      /** Not permitted to set to Work In Progress. */
+      WORKINPROGRESS_NOT_PERMITTED,
+
+      /** Not permitted to set from Work In Progress to New. */
+      READYFORREVIEW_NOT_PERMITTED
     }
 
     protected Type type;
