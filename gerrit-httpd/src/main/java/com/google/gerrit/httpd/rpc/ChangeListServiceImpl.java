@@ -15,6 +15,7 @@
 package com.google.gerrit.httpd.rpc;
 
 import com.google.gerrit.common.data.AccountDashboardInfo;
+import com.google.gerrit.common.data.AccountDashboardReviewInfo;
 import com.google.gerrit.common.data.ChangeInfo;
 import com.google.gerrit.common.data.ChangeListService;
 import com.google.gerrit.common.data.GlobalCapability;
@@ -24,6 +25,7 @@ import com.google.gerrit.common.errors.InvalidQueryException;
 import com.google.gerrit.common.errors.NoSuchEntityException;
 import com.google.gerrit.reviewdb.client.Account;
 import com.google.gerrit.reviewdb.client.Change;
+import com.google.gerrit.reviewdb.client.PatchSet;
 import com.google.gerrit.reviewdb.client.PatchSetApproval;
 import com.google.gerrit.reviewdb.client.StarredChange;
 import com.google.gerrit.reviewdb.server.ChangeAccess;
@@ -262,6 +264,85 @@ public class ChangeListServiceImpl extends BaseServiceImplementation implements
             && d.getForReview().isEmpty()) {
           throw new Failure(new NoSuchEntityException());
         }
+
+        d.setAccounts(ac.create());
+        return d;
+      }
+    });
+  }
+
+  public void reviewForAccount(final Account.Id id,
+      final AsyncCallback<AccountDashboardReviewInfo> callback) {
+    final Account.Id me = getAccountId();
+    final Account.Id target = id != null ? id : me;
+    if (target == null) {
+      callback.onFailure(new NoSuchEntityException());
+      return;
+    }
+
+    run(callback, new Action<AccountDashboardReviewInfo>() {
+      public AccountDashboardReviewInfo run(final ReviewDb db) throws OrmException,
+          InvalidQueryException, Failure {
+        final AccountInfoCacheFactory ac = accountInfoCacheFactory.create();
+        final Account user = ac.get(target);
+        if (user == null) {
+          throw new Failure(new NoSuchEntityException());
+        }
+
+        final Set<Change.Id> stars = currentUser.get().getStarredChanges();
+        final ChangeAccess changes = db.changes();
+        final AccountDashboardReviewInfo d;
+
+        final Set<Change.Id> openReviews = new HashSet<Change.Id>();
+        final Set<Change.Id> haveReviewed = new HashSet<Change.Id>();
+
+        d = new AccountDashboardReviewInfo(target);
+        d.setByOwner(filter(changes.byOwnerOpen(target), stars, ac, db));
+
+        // Get all changes with PatchSetApprovals owned by the current user.
+        // This will get changes that the current user submitted, has been
+        // requested to review, or has reviewed previously.
+        for (final PatchSetApproval ca : db.patchSetApprovals().openByUser(id)) {
+          openReviews.add(ca.getPatchSetId().getParentKey());
+        }
+
+        // Get remaining potentially reviewable changes (Starred or Watched).
+        openReviews.addAll(stars);
+
+        String sortkey = "z";
+        boolean gotResults;
+        do {
+          gotResults = false;
+          final ResultSet<Change> watchedChanges = searchQuery(db, "is:watched status:open", 1024, sortkey, QUERY_NEXT);
+          for (final Change change : watchedChanges) {
+            openReviews.add(change.getId());
+            sortkey = change.getSortKey();
+            gotResults = true;
+          }
+        } while(gotResults);
+
+        // Remove changes submitted by the current user.
+        for (final ChangeInfo c : d.getByOwner()) {
+          openReviews.remove(c.getId());
+        }
+
+        // Find the changes where the current user has reviewed the most recent
+        // patchset.
+        for (final Change.Id cid : openReviews) {
+          final PatchSet ps = db.patchSets().get(db.changes().get(cid).currPatchSetId());
+          for (final PatchSetApproval pa : db.patchSetApprovals().byPatchSetUser(ps.getId(), id)) {
+            if (pa.getValue() != 0) {
+              haveReviewed.add(cid);
+            }
+          }
+        }
+
+        openReviews.removeAll(haveReviewed);
+        d.setForReview(filter(changes.get(openReviews), stars, ac, db));
+        d.setHaveReviewed(filter(changes.get(haveReviewed), stars, ac, db));
+
+        Collections.sort(d.getForReview(), ID_COMP);
+        Collections.sort(d.getHaveReviewed(), ID_COMP);
 
         d.setAccounts(ac.create());
         return d;
