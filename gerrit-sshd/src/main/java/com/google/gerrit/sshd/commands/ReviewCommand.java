@@ -26,8 +26,10 @@ import com.google.gerrit.reviewdb.server.ReviewDb;
 import com.google.gerrit.server.changedetail.AbandonChange;
 import com.google.gerrit.server.changedetail.DeleteDraftPatchSet;
 import com.google.gerrit.server.changedetail.PublishDraft;
+import com.google.gerrit.server.changedetail.ReadyForReview;
 import com.google.gerrit.server.changedetail.RestoreChange;
 import com.google.gerrit.server.changedetail.Submit;
+import com.google.gerrit.server.changedetail.WorkInProgress;
 import com.google.gerrit.server.mail.EmailException;
 import com.google.gerrit.server.patch.PublishComments;
 import com.google.gerrit.server.project.InvalidChangeOperationException;
@@ -87,6 +89,12 @@ public class ReviewCommand extends BaseCommand {
   @Option(name = "--abandon", usage = "abandon the patch set")
   private boolean abandonChange;
 
+  @Option(name = "--workinprogress", usage = "set patch set state to Work In Progress")
+  private boolean workInProgress;
+
+  @Option(name = "--readyforreview", usage = "change patch set state from Work In Progress to New")
+  private boolean readyForReview;
+
   @Option(name = "--restore", usage = "restore an abandoned the patch set")
   private boolean restoreChange;
 
@@ -114,6 +122,12 @@ public class ReviewCommand extends BaseCommand {
 
   @Inject
   private AbandonChange.Factory abandonChangeFactory;
+
+  @Inject
+  private WorkInProgress.Factory workInProgressFactory;
+
+  @Inject
+  private ReadyForReview.Factory readyForReviewFactory;
 
   @Inject
   private PublishComments.Factory publishCommentsFactory;
@@ -149,6 +163,12 @@ public class ReviewCommand extends BaseCommand {
           if (deleteDraftPatchSet) {
             throw error("abandon and delete actions are mutually exclusive");
           }
+          if (workInProgress) {
+            throw error("abandon and workinprogress actions are mutually exclusive");
+          }
+          if (readyForReview) {
+            throw error("abandon and readyforreview actions are mutually exclusive");
+          }
         }
         if (publishPatchSet) {
           if (restoreChange) {
@@ -159,6 +179,37 @@ public class ReviewCommand extends BaseCommand {
           }
           if (deleteDraftPatchSet) {
             throw error("publish and delete actions are mutually exclusive");
+          }
+          if (workInProgress) {
+            throw error("publish and workinprogress actions are mutually exclusive");
+          }
+          if (readyForReview) {
+            throw error("publish and readyforreview actions are mutually exclusive");
+          }
+        }
+        if (workInProgress) {
+          if (restoreChange) {
+            throw error("workinprogress and restore actions are mutually exclusive");
+          }
+          if (submitChange) {
+            throw error("workinprogress and submit actions are mutually exclusive");
+          }
+          if (deleteDraftPatchSet) {
+            throw error("workinprogress and delete actions are mutually exclusive");
+          }
+          if (readyForReview) {
+            throw error("workinprogress and readyforreview actions are mutually exclusive");
+          }
+        }
+        if (readyForReview) {
+          if (restoreChange) {
+            throw error("readyforreview and restore actions are mutually exclusive");
+          }
+          if (submitChange) {
+            throw error("readyforreview and submit actions are mutually exclusive");
+          }
+          if (deleteDraftPatchSet) {
+            throw error("readyforreview and delete actions are mutually exclusive");
           }
         }
 
@@ -215,6 +266,14 @@ public class ReviewCommand extends BaseCommand {
         final ReviewResult result = restoreChangeFactory.create(
             patchSetId, changeComment).call();
         handleReviewResultErrors(result);
+      } else if (workInProgress) {
+        final ReviewResult result = workInProgressFactory.create(
+            patchSetId, changeComment).call();
+        handleReviewResultErrors(result);
+      } else if (readyForReview) {
+        final ReviewResult result = readyForReviewFactory.create(
+            patchSetId, changeComment).call();
+        handleReviewResultErrors(result);
       }
       if (submitChange) {
         final ReviewResult result = submitFactory.create(patchSetId).call();
@@ -269,6 +328,12 @@ public class ReviewCommand extends BaseCommand {
           break;
         case GIT_ERROR:
           errMsg += "error writing change to git repository";
+          break;
+        case WORKINPROGRESS_NOT_PERMITTED:
+          errMsg += "not permitted to set to Work In Progress";
+          break;
+        case READYFORREVIEW_NOT_PERMITTED:
+          errMsg += "not permitted to change from Work In Progress to New";
           break;
         default:
           errMsg += "failure in review";
