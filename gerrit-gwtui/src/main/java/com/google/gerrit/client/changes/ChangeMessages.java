@@ -20,6 +20,8 @@ public interface ChangeMessages extends Messages {
   String accountDashboardTitle(String fullName);
   String changesStartedBy(String fullName);
   String changesReviewableBy(String fullName);
+  String changesToBeReviewedBy(String fullName);
+  String changesReviewedBy(String fullName);
   String changesOpenInProject(String string);
   String changesMergedInProject(String string);
   String changesAbandonedInProject(String string);
