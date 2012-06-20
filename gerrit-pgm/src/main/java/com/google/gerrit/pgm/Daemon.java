@@ -29,6 +29,7 @@ import com.google.gerrit.pgm.http.jetty.GetUserFilter;
 import com.google.gerrit.pgm.http.jetty.JettyEnv;
 import com.google.gerrit.pgm.http.jetty.JettyModule;
 import com.google.gerrit.pgm.http.jetty.ProjectQoSFilter;
+import com.google.gerrit.pgm.http.melody.AcledMonitoringFilter;
 import com.google.gerrit.pgm.util.ErrorLogFile;
 import com.google.gerrit.pgm.util.LogFileCompressor;
 import com.google.gerrit.pgm.util.RuntimeShutdown;
@@ -278,6 +279,7 @@ public class Daemon extends SiteProgram {
 	authConfig.getAuthType() == AuthType.OPENID_SSO) {
       modules.add(new OpenIdModule());
     }
+    modules.add(sysInjector.getInstance(AcledMonitoringFilter.Module.class));
     modules.add(sysInjector.getInstance(GetUserFilter.Module.class));
 
     return sysInjector.createChildInjector(modules);
