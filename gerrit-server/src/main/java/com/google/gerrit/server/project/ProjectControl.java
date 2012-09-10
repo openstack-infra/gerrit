@@ -386,7 +386,11 @@ public class ProjectControl {
     final StringBuilder msg = new StringBuilder();
     msg.append(" A Contributor Agreement must be completed before uploading");
     if (canonicalWebUrl != null) {
-      msg.append(":\n\n  http://wiki.openstack.org/HowToContribute\n");
+      msg.append(":\n\n  ");
+      msg.append(canonicalWebUrl);
+      msg.append("#");
+      msg.append(PageLinks.SETTINGS_AGREEMENTS);
+      msg.append("\n");
     } else {
       msg.append(".");
     }
