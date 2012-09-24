@@ -305,7 +305,7 @@ public class ProjectControl {
         }
       }
 
-      if (bestAgreement == null) {
+      if (bestAgreement == null || !bestCla.isActive()) {
         final List<AccountAgreement> temp =
             db.accountAgreements().byAccount(iUser.getAccountId()).toList();
 
