@@ -18,7 +18,11 @@ package com.google.gerrit.common.errors;
 public class ContactInformationStoreException extends Exception {
   private static final long serialVersionUID = 1L;
 
-  public static final String MESSAGE = "Cannot store contact information";
+  public static final String MESSAGE =
+    "The request could not be completed. You may not be a member of\n" +
+    "the foundation registered under this email address. Before\n" +
+    "continuing, please make sure you have joined the foundation at\n" +
+    "http://openstack.org/register/";
 
   public ContactInformationStoreException() {
     super(MESSAGE);
