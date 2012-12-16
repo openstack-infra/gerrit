@@ -1,4 +1,4 @@
 [gerrit]
 host=review.openstack.org
 port=29418
-project=openstack-ci/gerrit.git
+project=openstack-infra/gerrit.git
