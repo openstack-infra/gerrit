@@ -106,11 +106,6 @@ final class StreamEvents extends BaseCommand {
   private PrintWriter stdout;
 
   @Override
-  public String toString() {
-    return "Stream Events (" + currentUser.getAccount().getUserName() + ")";
-  }
-
-  @Override
   public void start(final Environment env) throws IOException {
     try {
       parseCommandLine();
