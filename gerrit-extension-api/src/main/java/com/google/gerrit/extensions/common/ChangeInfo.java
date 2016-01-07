@@ -32,6 +32,7 @@ public class ChangeInfo {
   public ChangeStatus status;
   public Timestamp created;
   public Timestamp updated;
+  public Timestamp submitted;
   public Boolean starred;
   public Boolean reviewed;
   public Boolean mergeable;

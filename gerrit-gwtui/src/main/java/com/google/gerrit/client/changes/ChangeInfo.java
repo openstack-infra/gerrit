@@ -79,6 +79,10 @@ public class ChangeInfo extends JavaScriptObject {
     return new Change.Key(change_id()).abbreviate();
   }
 
+  public final Timestamp submitted() {
+    return JavaSqlTimestamp_JsonSerializer.parseTimestamp(submittedRaw());
+  }
+
   public final Change.Status status() {
     return Change.Status.valueOf(statusRaw());
   }
@@ -100,6 +104,7 @@ public class ChangeInfo extends JavaScriptObject {
   public final native AccountInfo owner() /*-{ return this.owner; }-*/;
   private final native String createdRaw() /*-{ return this.created; }-*/;
   private final native String updatedRaw() /*-{ return this.updated; }-*/;
+  private final native String submittedRaw() /*-{ return this.submitted; }-*/;
   public final native boolean starred() /*-{ return this.starred ? true : false; }-*/;
   public final native boolean reviewed() /*-{ return this.reviewed ? true : false; }-*/;
   public final native NativeMap<LabelInfo> all_labels() /*-{ return this.labels; }-*/;
