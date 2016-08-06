@@ -160,8 +160,8 @@ public class LuceneVersionManager implements LifecycleListener {
     }
 
     int latest = write.get(0).version;
+    reindexer = reindexerFactory.create(latest);
     if (latest != search.version) {
-      reindexer = reindexerFactory.create(latest);
       reindexer.start();
     }
   }
@@ -169,13 +169,14 @@ public class LuceneVersionManager implements LifecycleListener {
   /**
    * Start the online reindexer if the current index is not already the latest.
    *
+   * @param  force start re-index
    * @return true if started, otherwise false.
    * @throws ReindexerAlreadyRunningException
    */
-  public synchronized boolean startReindexer()
+  public synchronized boolean startReindexer(boolean force)
       throws ReindexerAlreadyRunningException {
-    validateReindexerNotRunning();
-    if (!isCurrentIndexVersionLatest()) {
+      validateReindexerNotRunning();
+    if (force || !isCurrentIndexVersionLatest()) {
       reindexer.start();
       return true;
     }
