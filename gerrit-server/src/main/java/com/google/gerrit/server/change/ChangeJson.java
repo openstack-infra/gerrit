@@ -385,6 +385,7 @@ public class ChangeJson {
         && reviewed.contains(cd.getId()) ? true : null;
 
     out.labels = labelsFor(ctl, cd, has(LABELS), has(DETAILED_LABELS));
+    out.submitted = getSubmittedOn(cd);
 
     if (out.labels != null && has(DETAILED_LABELS)) {
       // If limited to specific patch sets but not the current patch set, don't
@@ -589,6 +590,12 @@ public class ChangeJson {
         addApproval(e.getValue().label(), approvalInfo(accountId, value, date));
       }
     }
+  }
+
+  private Timestamp getSubmittedOn(ChangeData cd)
+      throws OrmException {
+    Optional<PatchSetApproval> s = cd.getSubmitApproval();
+    return s.isPresent() ? s.get().getGranted() : null;
   }
 
   private Map<String, LabelWithStatus> labelsForClosedChange(ChangeData cd,
