@@ -1,0 +1,42 @@
+- job:
+    name: gerrit-buck
+    parent: legacy-base
+    run: playbooks/gerrit-buck/run.yaml
+    post-run: playbooks/gerrit-buck/post.yaml
+    timeout: 2400
+
+- job:
+    name: gerrit-package-buck
+    parent: publish-openstack-artifacts
+    run: playbooks/gerrit-package-buck/run.yaml
+    post-run: playbooks/gerrit-package-buck/post.yaml
+    timeout: 2400
+
+- job:
+    name: its-storyboard-gerrit-plugin-stable-2.13
+    parent: publish-openstack-artifacts
+    run: playbooks/its-storyboard-gerrit-plugin-stable-2.13/run.yaml
+    post-run: playbooks/its-storyboard-gerrit-plugin-stable-2.13/post.yaml
+    timeout: 1800
+
+- job:
+    name: javamelody-gerrit-plugin-stable-2.13
+    parent: publish-openstack-artifacts
+    run: playbooks/javamelody-gerrit-plugin-stable-2.13/run.yaml
+    post-run: playbooks/javamelody-gerrit-plugin-stable-2.13/post.yaml
+    timeout: 1800
+
+- project:
+    check:
+      jobs:
+        - gerrit-buck
+    gate:
+      jobs:
+        - gerrit-buck
+    post:
+      jobs:
+        - gerrit-package-buck
+    periodic:
+      jobs:
+        - javamelody-gerrit-plugin-stable-2.13
+        - its-storyboard-gerrit-plugin-stable-2.13

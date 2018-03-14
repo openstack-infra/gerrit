@@ -1,0 +1,77 @@
+- hosts: all
+  name: Autoconverted job legacy-its-storyboard-gerrit-plugin-stable-2.13 from old
+    job its-storyboard-gerrit-plugin-stable-2.13
+  tasks:
+
+    - name: Ensure legacy workspace directory
+      file:
+        path: '{{ ansible_user_dir }}/workspace'
+        state: directory
+
+    - shell:
+        cmd: |
+          set -e
+          set -x
+          sudo bash -c "echo 'ant' >> /usr/local/bindep-fallback/bindep-fallback.txt"
+          sudo bash -c "echo 'ant-optional' >> /usr/local/bindep-fallback/bindep-fallback.txt"
+          sudo bash -c "echo 'default-jdk' >> /usr/local/bindep-fallback/bindep-fallback.txt"
+          sudo bash -c "echo 'asciidoc' >> /usr/local/bindep-fallback/bindep-fallback.txt"
+          sudo bash -c "echo 'nodejs' >> /usr/local/bindep-fallback/bindep-fallback.txt"
+        executable: /bin/bash
+        chdir: '{{ ansible_user_dir }}/workspace'
+      environment: '{{ zuul | zuul_legacy_vars }}'
+
+    - shell:
+        cmd: /usr/local/jenkins/slave_scripts/install-distro-packages.sh
+        chdir: '{{ ansible_user_dir }}/workspace'
+      environment: '{{ zuul | zuul_legacy_vars }}'
+
+    - shell:
+        cmd: |
+          set -x
+          sudo rm -f /etc/sudoers.d/zuul
+          # Prove that general sudo access is actually revoked
+          ! sudo -n true
+        executable: /bin/bash
+        chdir: '{{ ansible_user_dir }}/workspace'
+      environment: '{{ zuul | zuul_legacy_vars }}'
+
+    - shell:
+        cmd: |
+          set -e
+          set -x
+          if [[ ! -d "buck" ]]
+          then
+            git clone https://gerrit.googlesource.com/buck
+            cd buck
+            ant
+          fi
+        executable: /bin/bash
+        chdir: '{{ ansible_user_dir }}/workspace'
+      environment: '{{ zuul | zuul_legacy_vars }}'
+
+    - shell:
+        cmd: |
+          set -e
+          set -x
+          export PATH=`pwd`/buck/bin:$PATH
+          rm -rf gerrit
+          git clone -b openstack/2.13 https://git.openstack.org/openstack-infra/gerrit
+          PLUGIN_PARENT_PROJECT=https://gerrit.googlesource.com/plugins/its-base
+          if [ -n "$PLUGIN_PARENT_PROJECT" ]; then
+            git clone -b stable-2.13 https://gerrit.googlesource.com/plugins/its-base gerrit/plugins/its-base
+          fi
+          git clone -b stable-2.13 https://gerrit.googlesource.com/plugins/its-storyboard gerrit/plugins/its-storyboard
+          cd gerrit/plugins/its-storyboard
+          /usr/local/jenkins/slave_scripts/version-properties.sh
+          source version.properties
+          cd $WORKSPACE/gerrit
+          buck clean
+          if [ -n "$PLUGIN_PARENT_PROJECT" ]; then
+            buck build plugins/its-base:its-base
+          fi
+          buck build plugins/its-storyboard:its-storyboard
+          cp ./buck-out/gen/plugins/its-storyboard/its-storyboard.jar ./buck-out/gen/plugins/its-storyboard/its-storyboard-$PROJECT_VER.jar
+        executable: /bin/bash
+        chdir: '{{ ansible_user_dir }}/workspace'
+      environment: '{{ zuul | zuul_legacy_vars }}'
