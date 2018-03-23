@@ -1,6 +1,7 @@
 - job:
     name: gerrit-buck
     parent: legacy-base
+    pre-run: playbooks/gerrit-buck/pre.yaml
     run: playbooks/gerrit-buck/run.yaml
     post-run: playbooks/gerrit-buck/post.yaml
     timeout: 2400
@@ -8,6 +9,7 @@
 - job:
     name: gerrit-package-buck
     parent: publish-openstack-artifacts
+    pre-run: playbooks/gerrit-package-buck/pre.yaml
     run: playbooks/gerrit-package-buck/run.yaml
     post-run: playbooks/gerrit-package-buck/post.yaml
     timeout: 2400

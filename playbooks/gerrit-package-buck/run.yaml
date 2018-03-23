@@ -9,24 +9,6 @@
 
     - shell:
         cmd: |
-          set -e
-          set -x
-          sudo bash -c "echo 'ant' >> /usr/local/bindep-fallback/bindep-fallback.txt"
-          sudo bash -c "echo 'ant-optional' >> /usr/local/bindep-fallback/bindep-fallback.txt"
-          sudo bash -c "echo 'default-jdk' >> /usr/local/bindep-fallback/bindep-fallback.txt"
-          sudo bash -c "echo 'asciidoc' >> /usr/local/bindep-fallback/bindep-fallback.txt"
-          sudo bash -c "echo 'nodejs' >> /usr/local/bindep-fallback/bindep-fallback.txt"
-        executable: /bin/bash
-        chdir: '{{ ansible_user_dir }}/workspace'
-      environment: '{{ zuul | zuul_legacy_vars }}'
-
-    - shell:
-        cmd: /usr/local/jenkins/slave_scripts/install-distro-packages.sh
-        chdir: '{{ ansible_user_dir }}/workspace'
-      environment: '{{ zuul | zuul_legacy_vars }}'
-
-    - shell:
-        cmd: |
           set -x
           sudo rm -f /etc/sudoers.d/zuul
           # Prove that general sudo access is actually revoked
