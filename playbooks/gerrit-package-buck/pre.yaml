@@ -1,5 +1,0 @@
-- hosts: all
-  roles:
-
-    - role: bindep
-      bindep_dir: src/git.openstack.org/openstack-infra/gerrit

@@ -10,7 +10,7 @@
     - name: Copy files from {{ ansible_user_dir }}/workspace/ on node
       synchronize:
         src: '{{ ansible_user_dir }}/workspace/'
-        dest: '{{ zuul.executor.work_root }}/artifacts/test'
+        dest: '{{ zuul.executor.work_root }}/artifacts/{{ buck_publish_path }}'
         mode: pull
         copy_links: true
         verify_host: true
