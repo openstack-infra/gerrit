@@ -1,21 +1,14 @@
 - hosts: all
   name: Autoconverted job legacy-gerrit-buck from old job gate-gerrit-buck
+  roles:
+    # for version-properties.sh
+    - legacy-copy-jenkins-scripts
+    - revoke-sudo
   tasks:
-
     - name: Ensure legacy workspace directory
       file:
         path: '{{ ansible_user_dir }}/workspace'
         state: directory
-
-    - shell:
-        cmd: |
-          set -x
-          sudo rm -f /etc/sudoers.d/zuul
-          # Prove that general sudo access is actually revoked
-          ! sudo -n true
-        executable: /bin/bash
-        chdir: '{{ ansible_user_dir }}/workspace'
-      environment: '{{ zuul | zuul_legacy_vars }}'
 
     - shell:
         cmd: |
