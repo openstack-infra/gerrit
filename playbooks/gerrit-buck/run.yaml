@@ -3,7 +3,9 @@
   roles:
     # for version-properties.sh
     - legacy-copy-jenkins-scripts
+    - bindep
     - revoke-sudo
+
   tasks:
     - name: Ensure legacy workspace directory
       file:
