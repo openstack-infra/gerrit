@@ -13,3 +13,8 @@
         dest: '{{ zuul.executor.work_root }}/artifacts/'
         mode: pull
         verify_host: true
+        rsync_opts:
+          - --include=gerrit-*.war
+          - --include=*/
+          - --exclude=*
+          - --prune-empty-dirs
