@@ -1,4 +1,4 @@
-- hosts: primary
+- hosts: ubuntu-xenial
   tasks:
 
     - name: Ensure artifacts directory exists
