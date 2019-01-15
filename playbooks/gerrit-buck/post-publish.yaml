@@ -9,13 +9,7 @@
 
     - name: Copy files from {{ ansible_user_dir }}/workspace/ on node
       synchronize:
-        src: '{{ ansible_user_dir }}/workspace/'
-        dest: '{{ zuul.executor.work_root }}/artifacts/{{ buck_publish_path }}'
+        src: '{{ ansible_user_dir }}/workspace/gerrit/buck-out/gen/'
+        dest: '{{ zuul.executor.work_root }}/artifacts/'
         mode: pull
-        copy_links: true
         verify_host: true
-        rsync_opts:
-          - --include=/gerrit/buck-out/gen/gerrit-*.war
-          - --include=*/
-          - --exclude=*
-          - --prune-empty-dirs
